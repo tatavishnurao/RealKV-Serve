@@ -1,0 +1,16 @@
+model_id: Qwen/Qwen3-8B
+model_revision: main
+precision: float16
+backend: pytorch
+attention_backend: default
+prompt: "The capital of France is"
+max_new_tokens: 32
+temperature: 0.0
+top_p: 1.0
+seed: 0
+num_return_sequences: 1
+cuda_graphs: false
+kv_cache_offloading: false
+speculative_decoding: false
+beam_search: false
+prefix_reuse: false
