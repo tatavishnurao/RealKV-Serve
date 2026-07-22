@@ -1,7 +1,22 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"; cd "$ROOT"
-ARTIFACTS=0; [[ "${1:-}" == "--artifacts" ]] && ARTIFACTS=1
+usage() {
+  echo "usage: $0 [--artifacts]" >&2
+}
+
+ARTIFACTS=0
+case "$#:${1:-}" in
+  0:)
+    ;;
+  1:--artifacts)
+    ARTIFACTS=1
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac
 uv sync --frozen; uv run pytest -q; uv run ruff check .; bash -n scripts/*.sh; git diff --check
 echo MILESTONE1_CPU_VALIDATION_OK=1
 if (( ARTIFACTS )); then
