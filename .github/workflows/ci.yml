@@ -25,4 +25,5 @@ jobs:
       - run: uv run pytest -q
       - run: uv run ruff check .
       - run: bash -n scripts/*.sh
+      - run: bash tests/test_scripts.sh
       - run: bash scripts/validate_milestone1.sh

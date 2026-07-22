@@ -18,6 +18,7 @@ case "$#:${1:-}" in
     ;;
 esac
 uv sync --frozen; uv run pytest -q; uv run ruff check .; bash -n scripts/*.sh; git diff --check
+bash tests/test_scripts.sh
 echo MILESTONE1_CPU_VALIDATION_OK=1
 if (( ARTIFACTS )); then
   for f in reports/milestone1/baseline_generation.json reports/milestone1/traced_generation.json reports/milestone1/trace.jsonl reports/milestone1/source_map.json reports/milestone1/environment.json; do [[ -s "$f" ]] || { echo "missing artifact: $f" >&2; exit 1; }; done
