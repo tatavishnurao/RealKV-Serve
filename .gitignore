@@ -17,6 +17,8 @@ reports/milestone1/*.md
 !reports/milestone1/STATUS.md
 reports/milestone1/raw/
 !reports/milestone1/raw/
+reports/milestone1/raw/*
+!reports/milestone1/raw/README.md
 reports/milestone1/published/
 !reports/milestone1/published/
 !reports/milestone1/published/environment_summary.json
