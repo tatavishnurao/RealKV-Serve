@@ -37,6 +37,6 @@ if REALKV_RUNTIME_IMAGE='nvcr.io/example/runtime@sha256:deadbeef' REALKV_ALLOW_M
   echo "unconfigured traced execution was accepted" >&2
   exit 1
 fi
-rg -q 'Tracing requires' /tmp/realkv-script-test.out
+grep -q 'Tracing requires' /tmp/realkv-script-test.out
 
 echo SHELL_ENTRY_POINT_TESTS_OK=1
