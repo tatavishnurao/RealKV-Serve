@@ -16,6 +16,7 @@ reports/milestone1/*.md
 !reports/milestone1/runtime_support_verification.md
 !reports/milestone1/STATUS.md
 reports/milestone1/raw/
+!reports/milestone1/raw/
 reports/milestone1/published/
 !reports/milestone1/published/
 !reports/milestone1/published/environment_summary.json
@@ -24,5 +25,7 @@ reports/milestone1/published/
 !reports/milestone1/published/trace_summary.json
 !reports/milestone1/published/source_map.json
 !reports/milestone1/published/FINDINGS.md
+!reports/milestone1/published/README.md
+!reports/milestone1/raw/README.md
 model-cache/
 upstream/
