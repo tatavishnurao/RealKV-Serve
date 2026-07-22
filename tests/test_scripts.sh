@@ -22,11 +22,15 @@ if REALKV_RUNTIME_IMAGE='nvcr.io/example/runtime@sha256:deadbeef' bash scripts/r
   exit 1
 fi
 
-if bash scripts/validate_milestone1.sh --invalid >/tmp/realkv-script-test.out 2>&1; then
+set +e
+bash scripts/validate_milestone1.sh --invalid >/tmp/realkv-script-test.out 2>&1
+invalid_status=$?
+set -e
+if [[ "$invalid_status" -eq 0 ]]; then
   echo "invalid milestone argument was accepted" >&2
   exit 1
 fi
-test "$?" -eq 2
+test "$invalid_status" -eq 2
 
 if REALKV_RUNTIME_IMAGE='nvcr.io/example/runtime@sha256:deadbeef' REALKV_ALLOW_MODEL_DOWNLOAD=1 \
   bash scripts/run_traced_request.sh >/tmp/realkv-script-test.out 2>&1; then
