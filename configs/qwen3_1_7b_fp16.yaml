@@ -1,0 +1,23 @@
+# Active first-real-model workload for the RTX 4060 compatibility experiment.
+# model_revision must be replaced with an immutable Hugging Face commit SHA
+# before model download or execution.
+model_id: Qwen/Qwen3-1.7B
+model_revision: null
+precision: float16
+backend: pytorch
+attention_backend: default
+prompt: "The capital of France is"
+max_new_tokens: 32
+maximum_sequence_length: 256
+maximum_batch_size: 1
+tensor_parallelism: 1
+kv_cache_fraction: 0.2
+temperature: 0.0
+top_p: 1.0
+seed: 0
+num_return_sequences: 1
+cuda_graphs: false
+kv_cache_offloading: false
+speculative_decoding: false
+beam_search: false
+prefix_reuse: false
