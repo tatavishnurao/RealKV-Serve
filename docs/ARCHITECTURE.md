@@ -1,6 +1,6 @@
 # Runtime architecture
 
-This document is a template until the target DGX Spark run pins a release and source commit. The final version must link every node to a file and line range in `reports/milestone1/source_map.json` and distinguish direct calls, ownership, inference, and not-observed behavior.
+This document is a template until the target workstation run pins a release and source commit. The final version must link every node to a file and line range in `reports/milestone1/source_map.json` and distinguish direct calls, ownership, inference, and not-observed behavior.
 
 Expected investigation boundary:
 
