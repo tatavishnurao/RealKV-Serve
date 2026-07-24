@@ -1,7 +1,7 @@
 {
   "architecture": "x86_64",
-  "container_gpu_probe_failure_reason": null,
-  "container_gpu_probe_status": "NOT_RUN",
+  "container_gpu_probe_failure_reason": "failed to discover GPU vendor from CDI: no known GPU vendor found",
+  "container_gpu_probe_status": "FAILED",
   "docker_info_available": true,
   "docker_version": "Docker version 29.6.2, build dfc4efb1e2",
   "git_version": "git version 2.55.0",
@@ -16,5 +16,5 @@
   },
   "python_version": "3.14.6",
   "system_memory_bytes": 16535318528,
-  "timestamp_utc": "2026-07-24T18:21:30Z"
+  "timestamp_utc": "2026-07-24T18:24:56Z"
 }
