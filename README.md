@@ -4,6 +4,15 @@ Milestone-one compatibility and observability experiment for observing the paged
 
 This repository owns the experiment harness, schema, reports, and source map. TensorRT-LLM remains an external pinned container dependency. The milestone is observational and does not claim a better cache policy, performance improvement, or production readiness.
 
+## Compatibility scope
+
+The GeForce RTX 4060 Laptop GPU is an experimental consumer Ada target. This
+repository records five separate facts: architecture-level compatibility,
+named officially validated hardware, container compatibility, actual local
+runtime compatibility, and successful real-model execution. A successful run
+proves only the exact recorded local software and hardware combination; it is
+not an NVIDIA support certification or a production-serving result.
+
 ## Status
 
 The target workstation has not yet produced model or container execution evidence. Runtime artifacts and acceptance markers must be produced only by the target-machine workflow.
