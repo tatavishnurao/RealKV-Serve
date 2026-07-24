@@ -1,6 +1,8 @@
 {
   "architecture": "x86_64",
-  "container_gpu_probe_status": "NOT_YET_RECORDED",
+  "container_gpu_probe_command": "docker run --rm --gpus all ubuntu:24.04 nvidia-smi",
+  "container_gpu_probe_status": "failed",
+  "container_gpu_probe_failure_reason": "failed to discover GPU vendor from CDI: no known GPU vendor found",
   "cuda_driver": "610.43.03",
   "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
   "gpu_memory_mib": 8188,
