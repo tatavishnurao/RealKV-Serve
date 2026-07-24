@@ -1,3 +1,5 @@
+# Historical configuration from the pre-workstation scaffold. It is not the
+# active milestone target and must not be used for the RTX 4060 experiment.
 model_id: Qwen/Qwen3-8B
 model_revision: main
 precision: float16
