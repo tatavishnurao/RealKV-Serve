@@ -38,6 +38,6 @@ exec > >(tee "$OUT") 2>&1
 
 PYTHONPATH="$ROOT" python3 -c 'from realkv.environment import write; write("'"$ROOT"'/reports/milestone1/raw/environment.json")'
 if (( mandatory_failed )); then
-  echo "mandatory DGX host probes failed" >&2
+  echo "mandatory RTX 4060 workstation probes failed" >&2
   exit 1
 fi

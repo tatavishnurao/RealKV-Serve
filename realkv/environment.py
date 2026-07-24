@@ -35,7 +35,7 @@ def collect() -> dict:
         "system_memory_bytes": memory,
         "container_runtime": _cmd(["docker", "--version"]),
         "git_commit": _cmd(["git", "rev-parse", "HEAD"]),
-        "unified_memory_note": "DGX Spark GB10 unified memory makes generic framebuffer usage non-authoritative.",
+        "memory_note": "Record CUDA allocation, reservation, process RSS, and system memory separately.",
     }
 
 
