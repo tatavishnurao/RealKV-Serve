@@ -6,7 +6,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
   echo "REALKV_RUNTIME_IMAGE must include a sha256 digest" >&2
   exit 2
 }
-[[ "${REALKV_ALLOW_MODEL_DOWNLOAD:-}" == "1" ]] || { echo "Set REALKV_ALLOW_MODEL_DOWNLOAD=1 before downloading Qwen/Qwen3-1.7B into ${REALKV_MODEL_CACHE:-$ROOT/.cache/models}" >&2; exit 2; }
+[[ "${REALKV_ALLOW_MODEL_DOWNLOAD:-}" == "1" ]] || { echo "Set REALKV_ALLOW_MODEL_DOWNLOAD=1 before downloading Qwen/Qwen3-8B into ${REALKV_MODEL_CACHE:-$ROOT/.cache/models}" >&2; exit 2; }
 MODEL_CACHE="${REALKV_MODEL_CACHE:-$ROOT/.cache/models}"
 mkdir -p "$MODEL_CACHE"
 docker run --rm --runtime=nvidia --network=host -e HF_HOME=/models -v "$ROOT:/workspace" -v "$MODEL_CACHE:/models" "$REALKV_RUNTIME_IMAGE" \

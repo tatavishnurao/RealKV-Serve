@@ -1,23 +1,14 @@
 # RealKV-Serve
 
-Milestone-one compatibility and observability experiment for observing the paged KV-cache lifecycle of one deterministic `Qwen/Qwen3-1.7B` request through the TensorRT-LLM PyTorch backend on one Linux x86_64 workstation with an NVIDIA GeForce RTX 4060 Laptop GPU (8 GB VRAM).
+Milestone-one experiment for observing the paged KV-cache lifecycle of one deterministic `Qwen/Qwen3-8B` request through the TensorRT-LLM PyTorch backend on one DGX Spark.
 
 This repository owns the experiment harness, schema, reports, and source map. TensorRT-LLM remains an external pinned container dependency. The milestone is observational and does not claim a better cache policy, performance improvement, or production readiness.
 
-## Compatibility scope
-
-The GeForce RTX 4060 Laptop GPU is an experimental consumer Ada target. This
-repository records five separate facts: architecture-level compatibility,
-named officially validated hardware, container compatibility, actual local
-runtime compatibility, and successful real-model execution. A successful run
-proves only the exact recorded local software and hardware combination; it is
-not an NVIDIA support certification or a production-serving result.
-
 ## Status
 
-The target workstation has not yet produced model or container execution evidence. Runtime artifacts and acceptance markers must be produced only by the target-machine workflow.
+The host used to scaffold this repository is not a DGX Spark and no model/container execution has been performed here. Runtime artifacts and acceptance markers must be produced only by the target-machine workflow.
 
-## Run on the target workstation
+## Run on DGX Spark
 
 ```bash
 bash scripts/inspect_host.sh
