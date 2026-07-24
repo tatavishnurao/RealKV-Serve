@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 import os
 import platform
-import socket
 import subprocess
 import time
 
@@ -24,18 +23,24 @@ def collect() -> dict:
         pass
     return {
         "timestamp_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-        "hostname": socket.gethostname(),
         "architecture": platform.machine(),
         "os": platform.platform(),
         "kernel": platform.release(),
         "driver": _cmd(["nvidia-smi", "--query-gpu=driver_version", "--format=csv,noheader"]),
+        "gpu_query": _cmd(
+            [
+                "nvidia-smi",
+                "--query-gpu=name,driver_version,memory.total,compute_cap",
+                "--format=csv,noheader",
+            ]
+        ),
         "reported_cuda_version": _cmd(
             ["nvidia-smi", "--query-gpu=cuda_version", "--format=csv,noheader"]
         ),
         "system_memory_bytes": memory,
         "container_runtime": _cmd(["docker", "--version"]),
         "git_commit": _cmd(["git", "rev-parse", "HEAD"]),
-        "unified_memory_note": "DGX Spark GB10 unified memory makes generic framebuffer usage non-authoritative.",
+        "memory_note": "Record CUDA allocation, reservation, process RSS, and system memory separately.",
     }
 
 

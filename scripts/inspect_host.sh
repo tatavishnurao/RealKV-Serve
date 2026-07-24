@@ -22,9 +22,11 @@ probe() {
 exec > >(tee "$OUT") 2>&1
 {
   date -u +%FT%TZ
+  probe 1 kernel uname -a
   probe 1 architecture uname -m
   probe 1 os_release cat /etc/os-release
   probe 1 gpu nvidia-smi
+  probe 1 gpu_query nvidia-smi --query-gpu=name,driver_version,memory.total,compute_cap --format=csv
   probe 0 cuda nvcc --version
   probe 1 docker_version docker --version
   probe 0 docker_info docker info
@@ -33,11 +35,11 @@ exec > >(tee "$OUT") 2>&1
   probe 0 disk_space df -h "$HOME"
   probe 1 git git --version
   probe 1 python python3 --version
-  probe 1 container_gpu docker run --rm --runtime=nvidia ubuntu:24.04 nvidia-smi
+  probe 1 container_gpu docker run --rm --gpus all ubuntu:24.04 nvidia-smi
 }
 
 PYTHONPATH="$ROOT" python3 -c 'from realkv.environment import write; write("'"$ROOT"'/reports/milestone1/raw/environment.json")'
 if (( mandatory_failed )); then
-  echo "mandatory DGX host probes failed" >&2
+  echo "mandatory workstation probes failed" >&2
   exit 1
 fi

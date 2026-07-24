@@ -1,0 +1,17 @@
+{
+  "architecture": "x86_64",
+  "container_gpu_probe_status": "NOT_YET_RECORDED",
+  "cuda_driver": "610.43.03",
+  "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "gpu_memory_mib": 8188,
+  "compute_capability": "8.9",
+  "docker_available": true,
+  "host_gpu_probe": "passed",
+  "operating_system": "Linux x86_64",
+  "system_memory_bytes": 16535318528,
+  "sanitization": {
+    "hostname_published": false,
+    "private_addresses_published": false,
+    "credentials_published": false
+  }
+}
