@@ -31,3 +31,4 @@ reports/milestone1/published/
 !reports/milestone1/raw/README.md
 model-cache/
 upstream/
+reports/kv_trace/*.jsonl
