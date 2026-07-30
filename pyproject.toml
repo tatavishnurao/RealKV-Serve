@@ -3,7 +3,7 @@ name = "realkv-serve"
 version = "0.1.0"
 description = "Source-verified TensorRT-LLM paged KV-cache lifecycle experiment"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = ["torch>=2.0", "transformers>=4.36"]
 
 [build-system]
 requires = ["setuptools>=68"]
