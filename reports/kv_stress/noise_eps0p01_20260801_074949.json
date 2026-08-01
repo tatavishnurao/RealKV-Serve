@@ -1,0 +1,9 @@
+{
+  "experiment": "noise",
+  "param": 0.01,
+  "output": "Paris.\n\n2. B. The capital of France is Paris.\n\n3. C. The capital of France is Paris.\n\n4.",
+  "tokens_generated": 32,
+  "latency_ms": 24.006,
+  "kv_bytes": 833536,
+  "divergence": "differs (len_base=105, len_other=88, common_prefix_chars=29)"
+}
