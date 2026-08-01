@@ -82,6 +82,26 @@ def resolve_truncate_n(mode: str | int | None, current_seq_len: int) -> int | No
     return int(mode)
 
 
+def zero_kv(past_key_values: Any) -> Any:
+    """Zero all key and value tensors in the cache (hard corruption).
+
+    Simulates catastrophic cache wipe / memory corruption at a fixed step.
+    Operates in-place on tensor storage when possible, then returns a
+    legacy tuple so subsequent decode steps see the wiped state.
+    """
+    if past_key_values is None:
+        return None
+    layers = to_legacy_kv(past_key_values)
+    wiped: list[tuple[torch.Tensor, torch.Tensor]] = []
+    for k, v in layers:
+        k = k.clone()
+        v = v.clone()
+        k.zero_()
+        v.zero_()
+        wiped.append((k, v))
+    return from_legacy_kv(wiped)
+
+
 def load_model(device: str):
     """Load TinyLlama causal LM and tokenizer."""
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -104,14 +124,15 @@ def greedy_generate(
     experiment: str = "baseline",
     param: str | int | float = "full",
     truncate_mode: str | int | None = None,
+    zero_at_step: int | None = None,
 ) -> dict[str, Any]:
-    """Greedy decode with optional per-step KV truncation."""
+    """Greedy decode with optional KV truncation and/or one-shot zeroing."""
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     generated = inputs["input_ids"]
     past_key_values = None
     latencies: list[float] = []
 
-    for _step in range(max_new_tokens):
+    for step in range(max_new_tokens):
         step_start = time.monotonic()
         with torch.no_grad():
             if past_key_values is None:
@@ -138,6 +159,10 @@ def greedy_generate(
                 cur_len = layers[0][0].shape[2]
                 n = resolve_truncate_n(truncate_mode, cur_len)
                 past_key_values = truncate_kv(past_key_values, n)
+
+        # One-shot hard corruption at a fixed decode step.
+        if zero_at_step is not None and step == zero_at_step:
+            past_key_values = zero_kv(past_key_values)
 
         latencies.append((time.monotonic() - step_start) * 1000)
 
@@ -222,6 +247,24 @@ def run() -> None:
         print(f"Divergence: {result['divergence']}")
         write_report(result, REPORT_DIR / f"truncation_{label}_{stamp}.json")
         results.append(result)
+
+    zero_step = 10
+    print(f"\n=== Zeroing corruption at step {zero_step} ===")
+    zero_result = greedy_generate(
+        model,
+        tokenizer,
+        DEFAULT_PROMPT,
+        device,
+        experiment="zeroing",
+        param=zero_step,
+        zero_at_step=zero_step,
+    )
+    zero_result["divergence"] = describe_divergence(baseline_text, zero_result["output"])
+    print(f"Output: {zero_result['output']!r}")
+    print(f"Avg latency: {zero_result['latency_ms']} ms  KV bytes: {zero_result['kv_bytes']}")
+    print(f"Divergence: {zero_result['divergence']}")
+    write_report(zero_result, REPORT_DIR / f"zeroing_step{zero_step}_{stamp}.json")
+    results.append(zero_result)
 
     summary_path = REPORT_DIR / f"summary_{stamp}.json"
     write_report(
