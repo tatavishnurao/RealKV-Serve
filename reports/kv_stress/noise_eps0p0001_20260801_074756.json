@@ -1,0 +1,9 @@
+{
+  "experiment": "noise",
+  "param": 0.0001,
+  "output": "Paris.\n\n2. B. The capital of Germany is Berlin.\n\n3. C. The capital of the United States is Washington, D.",
+  "tokens_generated": 32,
+  "latency_ms": 75.005,
+  "kv_bytes": 833536,
+  "divergence": "identical"
+}
