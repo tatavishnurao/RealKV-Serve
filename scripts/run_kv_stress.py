@@ -7,14 +7,13 @@ zeroing (corruption), and noise injection on a real causal LM.
 from __future__ import annotations
 
 import json
-import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, DynamicCache
 
 MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 DEFAULT_PROMPT = "The capital of France is"
@@ -38,17 +37,25 @@ def to_legacy_kv(past_key_values: Any) -> list[tuple[torch.Tensor, torch.Tensor]
     """Normalize past_key_values to a list of (key, value) tensor pairs."""
     if past_key_values is None:
         return []
+    # transformers 5+ DynamicCache
+    if hasattr(past_key_values, "layers"):
+        out: list[tuple[torch.Tensor, torch.Tensor]] = []
+        for layer in past_key_values.layers:
+            keys = getattr(layer, "keys", None)
+            values = getattr(layer, "values", None)
+            if keys is not None and values is not None:
+                out.append((keys, values))
+        if out:
+            return out
     if hasattr(past_key_values, "to_legacy_cache"):
         legacy = past_key_values.to_legacy_cache()
         return [(k, v) for k, v in legacy]
     return [(layer[0], layer[1]) for layer in past_key_values]
 
 
-def from_legacy_kv(
-    layers: list[tuple[torch.Tensor, torch.Tensor]],
-) -> tuple[tuple[torch.Tensor, torch.Tensor], ...]:
-    """Convert list of (k, v) pairs to a tuple past_key_values."""
-    return tuple(layers)
+def from_legacy_kv(layers: list[tuple[torch.Tensor, torch.Tensor]]) -> Any:
+    """Rebuild a DynamicCache (transformers 5+) from (k, v) pairs."""
+    return DynamicCache(ddp_cache_data=layers)
 
 
 def truncate_kv(
@@ -86,8 +93,7 @@ def zero_kv(past_key_values: Any) -> Any:
     """Zero all key and value tensors in the cache (hard corruption).
 
     Simulates catastrophic cache wipe / memory corruption at a fixed step.
-    Operates in-place on tensor storage when possible, then returns a
-    legacy tuple so subsequent decode steps see the wiped state.
+    Returns a fresh DynamicCache so subsequent decode steps see wiped state.
     """
     if past_key_values is None:
         return None
@@ -125,7 +131,7 @@ def load_model(device: str):
     dtype = torch.float16 if device == "cuda" else torch.float32
     model = AutoModelForCausalLM.from_pretrained(
         MODEL_NAME,
-        torch_dtype=dtype,
+        dtype=dtype,
         use_cache=True,
     ).to(device)
     model.eval()
