@@ -51,6 +51,37 @@ def from_legacy_kv(
     return tuple(layers)
 
 
+def truncate_kv(
+    past_key_values: Any,
+    n: int | None,
+) -> Any:
+    """Keep only the last N positions of each layer's K/V tensors.
+
+    n=None means no truncation (full cache). Simulates reduced context
+    windows such as aggressive sliding-window attention.
+    """
+    if past_key_values is None or n is None:
+        return past_key_values
+    layers = to_legacy_kv(past_key_values)
+    truncated: list[tuple[torch.Tensor, torch.Tensor]] = []
+    for k, v in layers:
+        seq_len = k.shape[2]
+        keep = min(n, seq_len)
+        if keep <= 0:
+            keep = seq_len
+        truncated.append((k[:, :, -keep:, :].contiguous(), v[:, :, -keep:, :].contiguous()))
+    return from_legacy_kv(truncated)
+
+
+def resolve_truncate_n(mode: str | int | None, current_seq_len: int) -> int | None:
+    """Map truncation mode to a concrete keep-N value."""
+    if mode is None or mode == "full":
+        return None
+    if mode == "half":
+        return max(1, current_seq_len // 2)
+    return int(mode)
+
+
 def load_model(device: str):
     """Load TinyLlama causal LM and tokenizer."""
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -70,8 +101,11 @@ def greedy_generate(
     prompt: str,
     device: str,
     max_new_tokens: int = MAX_NEW_TOKENS,
+    experiment: str = "baseline",
+    param: str | int | float = "full",
+    truncate_mode: str | int | None = None,
 ) -> dict[str, Any]:
-    """Baseline greedy decode with use_cache=True (no KV manipulation)."""
+    """Greedy decode with optional per-step KV truncation."""
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     generated = inputs["input_ids"]
     past_key_values = None
@@ -96,14 +130,23 @@ def greedy_generate(
         next_token = logits.argmax(dim=-1, keepdim=True)
         generated = torch.cat([generated, next_token], dim=1)
         past_key_values = out.past_key_values
+
+        # Apply KV truncation after each step (reduced-context simulation).
+        if truncate_mode is not None and truncate_mode != "full":
+            layers = to_legacy_kv(past_key_values)
+            if layers:
+                cur_len = layers[0][0].shape[2]
+                n = resolve_truncate_n(truncate_mode, cur_len)
+                past_key_values = truncate_kv(past_key_values, n)
+
         latencies.append((time.monotonic() - step_start) * 1000)
 
     prompt_len = inputs["input_ids"].shape[1]
     new_tokens = generated[0, prompt_len:]
     output_text = tokenizer.decode(new_tokens, skip_special_tokens=True)
     return {
-        "experiment": "baseline",
-        "param": "full",
+        "experiment": experiment,
+        "param": param,
         "output": output_text,
         "tokens_generated": int(new_tokens.shape[0]),
         "latency_ms": round(sum(latencies) / len(latencies), 3) if latencies else 0.0,
@@ -120,6 +163,21 @@ def write_report(result: dict[str, Any], path: Path) -> None:
         f.write("\n")
 
 
+def describe_divergence(baseline: str, other: str) -> str:
+    """Human-readable divergence summary vs baseline text."""
+    if baseline == other:
+        return "identical"
+    common_prefix = 0
+    for a, b in zip(baseline, other):
+        if a != b:
+            break
+        common_prefix += 1
+    return (
+        f"differs (len_base={len(baseline)}, len_other={len(other)}, "
+        f"common_prefix_chars={common_prefix})"
+    )
+
+
 def run() -> None:
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Device: {device}")
@@ -129,15 +187,53 @@ def run() -> None:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
-    print("\n=== Baseline (full KV cache) ===")
-    baseline = greedy_generate(model, tokenizer, DEFAULT_PROMPT, device)
+    results: list[dict[str, Any]] = []
+
+    print("\n=== Truncation: full (baseline) ===")
+    baseline = greedy_generate(
+        model,
+        tokenizer,
+        DEFAULT_PROMPT,
+        device,
+        experiment="truncation",
+        param="full",
+        truncate_mode="full",
+    )
     print(f"Output: {baseline['output']!r}")
-    print(f"Avg latency: {baseline['latency_ms']} ms")
-    print(f"KV bytes: {baseline['kv_bytes']}")
-    write_report(baseline, REPORT_DIR / f"baseline_full_{stamp}.json")
+    print(f"Avg latency: {baseline['latency_ms']} ms  KV bytes: {baseline['kv_bytes']}")
+    write_report(baseline, REPORT_DIR / f"truncation_full_{stamp}.json")
+    results.append(baseline)
+    baseline_text = baseline["output"]
+
+    for mode, label in [("half", "half"), (8, "last8")]:
+        print(f"\n=== Truncation: {label} ===")
+        result = greedy_generate(
+            model,
+            tokenizer,
+            DEFAULT_PROMPT,
+            device,
+            experiment="truncation",
+            param=mode if mode != 8 else 8,
+            truncate_mode=mode,
+        )
+        result["divergence"] = describe_divergence(baseline_text, result["output"])
+        print(f"Output: {result['output']!r}")
+        print(f"Avg latency: {result['latency_ms']} ms  KV bytes: {result['kv_bytes']}")
+        print(f"Divergence: {result['divergence']}")
+        write_report(result, REPORT_DIR / f"truncation_{label}_{stamp}.json")
+        results.append(result)
 
     summary_path = REPORT_DIR / f"summary_{stamp}.json"
-    write_report({"results": [baseline], "model": MODEL_NAME, "device": device}, summary_path)
+    write_report(
+        {
+            "model": MODEL_NAME,
+            "device": device,
+            "prompt": DEFAULT_PROMPT,
+            "max_new_tokens": MAX_NEW_TOKENS,
+            "results": results,
+        },
+        summary_path,
+    )
 
     print(f"\nReports written under {REPORT_DIR}/")
     print("KV_STRESS_RUN_OK=1")
