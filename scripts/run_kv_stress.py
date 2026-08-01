@@ -102,6 +102,23 @@ def zero_kv(past_key_values: Any) -> Any:
     return from_legacy_kv(wiped)
 
 
+def inject_noise_kv(past_key_values: Any, epsilon: float) -> Any:
+    """Add Gaussian noise to every key and value tensor.
+
+    Applied each decode step so noise can accumulate as generation
+    continues. epsilon scales the noise magnitude (e.g. 1e-4, 1e-2).
+    """
+    if past_key_values is None or epsilon <= 0:
+        return past_key_values
+    layers = to_legacy_kv(past_key_values)
+    noisy: list[tuple[torch.Tensor, torch.Tensor]] = []
+    for k, v in layers:
+        k = k + torch.randn_like(k) * epsilon
+        v = v + torch.randn_like(v) * epsilon
+        noisy.append((k, v))
+    return from_legacy_kv(noisy)
+
+
 def load_model(device: str):
     """Load TinyLlama causal LM and tokenizer."""
     tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
@@ -125,8 +142,9 @@ def greedy_generate(
     param: str | int | float = "full",
     truncate_mode: str | int | None = None,
     zero_at_step: int | None = None,
+    noise_epsilon: float | None = None,
 ) -> dict[str, Any]:
-    """Greedy decode with optional KV truncation and/or one-shot zeroing."""
+    """Greedy decode with optional KV truncation, zeroing, or noise injection."""
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     generated = inputs["input_ids"]
     past_key_values = None
@@ -163,6 +181,10 @@ def greedy_generate(
         # One-shot hard corruption at a fixed decode step.
         if zero_at_step is not None and step == zero_at_step:
             past_key_values = zero_kv(past_key_values)
+
+        # Per-step Gaussian noise so perturbation can accumulate.
+        if noise_epsilon is not None and noise_epsilon > 0:
+            past_key_values = inject_noise_kv(past_key_values, noise_epsilon)
 
         latencies.append((time.monotonic() - step_start) * 1000)
 
@@ -265,6 +287,28 @@ def run() -> None:
     print(f"Divergence: {zero_result['divergence']}")
     write_report(zero_result, REPORT_DIR / f"zeroing_step{zero_step}_{stamp}.json")
     results.append(zero_result)
+
+    for eps in (1e-4, 1e-2):
+        label = f"{eps:g}".replace(".", "p")
+        print(f"\n=== Noise injection epsilon={eps} ===")
+        noise_result = greedy_generate(
+            model,
+            tokenizer,
+            DEFAULT_PROMPT,
+            device,
+            experiment="noise",
+            param=eps,
+            noise_epsilon=eps,
+        )
+        noise_result["divergence"] = describe_divergence(baseline_text, noise_result["output"])
+        print(f"Output: {noise_result['output']!r}")
+        print(
+            f"Avg latency: {noise_result['latency_ms']} ms  "
+            f"KV bytes: {noise_result['kv_bytes']}"
+        )
+        print(f"Divergence: {noise_result['divergence']}")
+        write_report(noise_result, REPORT_DIR / f"noise_eps{label}_{stamp}.json")
+        results.append(noise_result)
 
     summary_path = REPORT_DIR / f"summary_{stamp}.json"
     write_report(
