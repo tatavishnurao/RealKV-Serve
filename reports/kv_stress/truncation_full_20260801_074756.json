@@ -1,0 +1,9 @@
+{
+  "experiment": "truncation",
+  "param": "full",
+  "output": "Paris.\n\n2. B. The capital of Germany is Berlin.\n\n3. C. The capital of the United States is Washington, D.",
+  "tokens_generated": 32,
+  "latency_ms": 114.202,
+  "kv_bytes": 833536,
+  "divergence": null
+}
