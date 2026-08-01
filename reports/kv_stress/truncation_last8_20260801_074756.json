@@ -1,0 +1,9 @@
+{
+  "experiment": "truncation",
+  "param": 8,
+  "output": "Paris.\n\n1 What is the answer: The 2::::::::00000000000",
+  "tokens_generated": 32,
+  "latency_ms": 65.02,
+  "kv_bytes": 180224,
+  "divergence": "differs (len_base=105, len_other=54, common_prefix_chars=8)"
+}
