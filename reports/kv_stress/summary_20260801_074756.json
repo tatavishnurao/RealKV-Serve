@@ -1,0 +1,62 @@
+{
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "device": "cuda",
+  "prompt": "The capital of France is",
+  "max_new_tokens": 32,
+  "results": [
+    {
+      "experiment": "truncation",
+      "param": "full",
+      "output": "Paris.\n\n2. B. The capital of Germany is Berlin.\n\n3. C. The capital of the United States is Washington, D.",
+      "tokens_generated": 32,
+      "latency_ms": 114.202,
+      "kv_bytes": 833536,
+      "divergence": null
+    },
+    {
+      "experiment": "truncation",
+      "param": "half",
+      "output": "Paris is isis, \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+      "tokens_generated": 32,
+      "latency_ms": 61.136,
+      "kv_bytes": 22528,
+      "divergence": "differs (len_base=105, len_other=41, common_prefix_chars=5)"
+    },
+    {
+      "experiment": "truncation",
+      "param": 8,
+      "output": "Paris.\n\n1 What is the answer: The 2::::::::00000000000",
+      "tokens_generated": 32,
+      "latency_ms": 65.02,
+      "kv_bytes": 180224,
+      "divergence": "differs (len_base=105, len_other=54, common_prefix_chars=8)"
+    },
+    {
+      "experiment": "zeroing",
+      "param": 10,
+      "output": "Paris.\n\n2. B. The capital of the Constitution of the of the and the and and and and and and and and and and and and and",
+      "tokens_generated": 32,
+      "latency_ms": 47.795,
+      "kv_bytes": 833536,
+      "divergence": "differs (len_base=105, len_other=119, common_prefix_chars=29)"
+    },
+    {
+      "experiment": "noise",
+      "param": 0.0001,
+      "output": "Paris.\n\n2. B. The capital of Germany is Berlin.\n\n3. C. The capital of the United States is Washington, D.",
+      "tokens_generated": 32,
+      "latency_ms": 75.005,
+      "kv_bytes": 833536,
+      "divergence": "identical"
+    },
+    {
+      "experiment": "noise",
+      "param": 0.01,
+      "output": "Paris.\n\nBased on the text material, can you provide a summary of the capital of France and its location in the world? \n<",
+      "tokens_generated": 32,
+      "latency_ms": 74.803,
+      "kv_bytes": 833536,
+      "divergence": "differs (len_base=105, len_other=120, common_prefix_chars=8)"
+    }
+  ]
+}
