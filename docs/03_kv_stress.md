@@ -59,47 +59,78 @@ For each run, JSON reports under `reports/kv_stress/` include:
 
 ## Expected vs Observed Behavior
 
+Measured on **RTX 4060**, TinyLlama-1.1B, greedy, 32 new tokens, prompt
+`"The capital of France is"` (run `20260801_074756`).
+
+### Baseline output (full KV)
+
+```text
+Paris.
+
+2. B. The capital of Germany is Berlin.
+
+3. C. The capital of the United States is Washington, D.
+```
+
 ### Which breaks output the most?
 
 **Expectation (ordered severity):**
 
-1. **Zeroing at step 10** — should break mid-sequence continuity hardest
+1. **Zeroing at step 10** — break mid-sequence continuity hardest
 2. **Noise ε=1e-2** — strong accumulated corruption
-3. **Truncation last-8** — severe context loss
-4. **Truncation half** — moderate degradation
-5. **Noise ε=1e-4** — often near-baseline
-6. **Full baseline** — reference
+3. **Truncation last-8 / half** — severe context loss
+4. **Noise ε=1e-4** — near-baseline
+5. **Full baseline** — reference
 
-**Observation:** Re-run `bash scripts/run_kv_stress.sh` and compare `output` /
-`divergence` fields in `reports/kv_stress/*.json`. In practice, zeroing and
-large-ε noise produce the largest text divergence; last-8 truncation also
-diverges sharply from the full-cache continuation.
+**Observation (this run):**
+
+| Experiment | Divergence vs baseline | Notes |
+|---|---|---|
+| half truncation | differs early (`common_prefix_chars=5`) | Degenerates to `"Paris is isis,"` then newlines |
+| last-8 truncation | differs (`common_prefix_chars=8`) | Keeps `"Paris.\n\n"` then garbage / colon spam |
+| zeroing @ step 10 | differs (`common_prefix_chars=29`) | Preserves early quiz structure, then `"and and and..."` loop |
+| noise ε=1e-4 | **identical** | Below damage threshold for 32 tokens |
+| noise ε=1e-2 | differs (`common_prefix_chars=8`) | Diverts into a different instructional continuation |
+
+**Most disruptive in practice:** aggressive **half truncation** produced the
+most unusable text. **Zeroing** was the harshest *discrete* mid-run failure
+(long shared prefix, then total collapse). **ε=1e-2 noise** broke semantics
+without full gibberish. **ε=1e-4** did not break output at all.
 
 ### Does truncation degrade gracefully?
 
-**Expectation:** Yes — full ≈ half > last-8 in quality and fidelity to baseline.
+**Expectation:** Yes — full ≳ half > last-8 in fidelity.
 
-**Observation:** Half truncation often preserves a longer common prefix with the
-baseline than last-8. Last-8 tends to diverge earlier because prompt+history
-beyond 8 tokens is discarded every step. KV byte counts at the end of a last-8
-run stay near a small plateau (cache cannot grow unbounded past ~8 positions
-between steps before the next truncate).
+**Observation:** Not fully graceful. **Half** truncation was *worse* than
+**last-8** here: half collapsed into repetitive whitespace, while last-8 still
+emitted token-like structure. Both diverged from baseline quickly. Final
+`kv_bytes` for half (~22 KiB) and last-8 (~176 KiB) stayed far below full
+(~814 KiB), confirming the cache cannot grow unboundedly under per-step
+windowing.
 
 ### Does noise accumulate?
 
-**Expectation:** Yes when noise is injected every step — variance in the cache
-grows with depth.
+**Expectation:** Yes when injected every step.
 
-**Observation:** `ε=1e-4` often remains close to baseline for short 32-token
-runs. `ε=1e-2` typically yields clearly different text, consistent with
-step-wise accumulation rather than a one-shot perturbation.
+**Observation:** Supported. Small noise (`1e-4`) matched baseline exactly over
+32 steps. Large noise (`1e-2`) changed the continuation after a short shared
+prefix — consistent with per-step accumulation crossing a quality threshold
+rather than a single-shot flip.
 
 ### Latency impact
 
-Manipulations are tensor ops on the cache between forward passes. On short
-TinyLlama runs they add little wall-time versus the forward itself; average
-`latency_ms` stays in the same order of magnitude as baseline. Latency is
-recorded so regressions remain measurable on RTX 4060 (or CPU fallback).
+| Experiment | Avg latency (ms) |
+|---|---|
+| full | 114.2 |
+| half | 61.1 |
+| last-8 | 65.0 |
+| zeroing | 47.8 |
+| noise 1e-4 | 75.0 |
+| noise 1e-2 | 74.8 |
+
+Manipulations are cheap relative to the forward pass. Shorter effective cache
+(truncation) correlated with *lower* average step latency in this run. Numbers
+are host-observed averages, not kernel timers.
 
 ## Running
 
