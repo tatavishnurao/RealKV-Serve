@@ -1,0 +1,9 @@
+{
+  "experiment": "zeroing",
+  "param": 10,
+  "output": "Paris.\n\n2. B. The capital of the Constitution of the of the and the and and and and and and and and and and and and and",
+  "tokens_generated": 32,
+  "latency_ms": 59.672,
+  "kv_bytes": 833536,
+  "divergence": "differs (len_base=105, len_other=119, common_prefix_chars=29)"
+}
