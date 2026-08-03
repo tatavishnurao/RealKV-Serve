@@ -1,0 +1,12 @@
+{
+  "mode": "latent",
+  "compression_ratio": 4,
+  "output": "Paris, and the the the the the the way of the the the the the the the the the the the the the the way, and the the the the",
+  "tokens_generated": 32,
+  "latency_ms": 12.026,
+  "kv_bytes": 208384,
+  "kv_bytes_stored": 833536,
+  "divergence": "differs (len_base=105, len_other=122, common_prefix_chars=5)",
+  "common_prefix_chars": 5,
+  "kv_saved_bytes": 625152
+}
