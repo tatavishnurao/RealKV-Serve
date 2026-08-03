@@ -1,0 +1,54 @@
+{
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "device": "cuda",
+  "prompt": "The capital of France is",
+  "max_new_tokens": 32,
+  "results": [
+    {
+      "mode": "baseline",
+      "compression_ratio": 1,
+      "output": "Paris.\n\n2. B. The capital of Germany is Berlin.\n\n3. C. The capital of the United States is Washington, D.",
+      "tokens_generated": 32,
+      "latency_ms": 11.354,
+      "kv_bytes": 833536,
+      "kv_bytes_stored": 833536,
+      "divergence": null
+    },
+    {
+      "mode": "latent",
+      "compression_ratio": 2,
+      "output": "Paris, the capital of the capital of the of the of the of the of the of the of the of the of of of of the of the of the",
+      "tokens_generated": 32,
+      "latency_ms": 11.425,
+      "kv_bytes": 416768,
+      "kv_bytes_stored": 833536,
+      "divergence": "differs (len_base=105, len_other=119, common_prefix_chars=5)",
+      "common_prefix_chars": 5,
+      "kv_saved_bytes": 416768
+    },
+    {
+      "mode": "latent",
+      "compression_ratio": 4,
+      "output": "Paris, and the the the the the the way of the the the the the the the the the the the the the the way, and the the the the",
+      "tokens_generated": 32,
+      "latency_ms": 12.026,
+      "kv_bytes": 208384,
+      "kv_bytes_stored": 833536,
+      "divergence": "differs (len_base=105, len_other=122, common_prefix_chars=5)",
+      "common_prefix_chars": 5,
+      "kv_saved_bytes": 625152
+    },
+    {
+      "mode": "latent",
+      "compression_ratio": 8,
+      "output": "Paris.\n \u0420\u0435\u0437\u0443pays.\nWHERE, and and and and and and and and and and the the the the the the the the the the the the",
+      "tokens_generated": 32,
+      "latency_ms": 11.54,
+      "kv_bytes": 104192,
+      "kv_bytes_stored": 833536,
+      "divergence": "differs (len_base=105, len_other=112, common_prefix_chars=7)",
+      "common_prefix_chars": 7,
+      "kv_saved_bytes": 729344
+    }
+  ]
+}
