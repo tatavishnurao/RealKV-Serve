@@ -1,0 +1,5 @@
+{
+  "model": "microsoft/Phi-3-mini-4k-instruct",
+  "available": false,
+  "skipped_reason": "load failed: CUDA out of memory. Tried to allocate 54.00 MiB. GPU 0 has a total capacity of 7.63 GiB of which 88.00 MiB is free. Process 1451 has 104.41 MiB memory in use. Process 48381 has 253.34 MiB memory in use. Process 80225 has 98.03 MiB memory in use. Including non-PyTorch memory, this process has 6.47 GiB memory in use. Of the allocated memory 6.33 GiB is allocated by PyTorch, and 13.54 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)"
+}
