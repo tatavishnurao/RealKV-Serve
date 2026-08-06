@@ -1,0 +1,13 @@
+{
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "prompt": "The capital of France is",
+  "trace_tokens": 64,
+  "rank": 16,
+  "head_dim": 64,
+  "num_layers": 22,
+  "kv_heads": 4,
+  "explained_variance_k": 0.8654,
+  "explained_variance_v": 0.7003,
+  "projection_error": 0.3651,
+  "basis_path": "reports/kv_subspace/TinyLlama-1.1B-Chat-v1.0/basis.pt"
+}
