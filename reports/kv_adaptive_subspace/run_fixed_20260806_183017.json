@@ -1,0 +1,244 @@
+{
+  "method": "fixed",
+  "rank": 16,
+  "output": "Paris.\n\nBased on the United Nations, and the United States.\n2.\nThe capital of the United States.\nBased on the",
+  "tokens_generated": 32,
+  "token_ids": [
+    3681,
+    29889,
+    13,
+    13,
+    29933,
+    1463,
+    373,
+    278,
+    3303,
+    18269,
+    29892,
+    322,
+    278,
+    3303,
+    3900,
+    29889,
+    13,
+    29906,
+    29889,
+    13,
+    1576,
+    7483,
+    310,
+    278,
+    3303,
+    3900,
+    29889,
+    13,
+    29933,
+    1463,
+    373,
+    278
+  ],
+  "latency_ms": 11.38,
+  "latency_per_token_ms": [
+    9.147,
+    9.689,
+    8.521,
+    17.149,
+    9.284,
+    8.733,
+    15.115,
+    12.774,
+    12.67,
+    8.721,
+    10.199,
+    10.379,
+    10.302,
+    10.181,
+    10.53,
+    11.696,
+    10.98,
+    11.42,
+    11.121,
+    11.739,
+    11.418,
+    12.141,
+    9.365,
+    10.745,
+    10.93,
+    11.342,
+    10.899,
+    11.469,
+    11.142,
+    11.778,
+    13.932,
+    18.657
+  ],
+  "kv_bytes": 208384,
+  "kv_bytes_stored": 833536,
+  "bytes_per_token": 22528.0,
+  "per_token_errors": [
+    {
+      "token": 0,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 1,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 2,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 3,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 4,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 5,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 6,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 7,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 8,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 9,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 10,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 11,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 12,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 13,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 14,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 15,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 16,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 17,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 18,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 19,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 20,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 21,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 22,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 23,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 24,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 25,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 26,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 27,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 28,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 29,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 30,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 31,
+      "err_k": 0.0,
+      "err_v": 0.0
+    }
+  ],
+  "divergence": "differs (len_base=105, len_other=109, common_prefix_chars=8)",
+  "break_point": 4,
+  "recon_error": 0.0,
+  "kv_saved_bytes": 625152
+}

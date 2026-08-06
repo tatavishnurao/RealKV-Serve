@@ -1,0 +1,244 @@
+{
+  "method": "baseline",
+  "rank": 16,
+  "output": "Paris.\n\n2. B. The capital of Germany is Berlin.\n\n3. C. The capital of the United States is Washington, D.",
+  "tokens_generated": 32,
+  "token_ids": [
+    3681,
+    29889,
+    13,
+    13,
+    29906,
+    29889,
+    350,
+    29889,
+    450,
+    7483,
+    310,
+    9556,
+    338,
+    5115,
+    29889,
+    13,
+    13,
+    29941,
+    29889,
+    315,
+    29889,
+    450,
+    7483,
+    310,
+    278,
+    3303,
+    3900,
+    338,
+    7660,
+    29892,
+    360,
+    29889
+  ],
+  "latency_ms": 11.073,
+  "latency_per_token_ms": [
+    34.815,
+    6.669,
+    7.666,
+    6.566,
+    9.47,
+    10.479,
+    10.908,
+    10.551,
+    11.011,
+    10.393,
+    10.546,
+    10.542,
+    10.902,
+    10.581,
+    11.121,
+    11.168,
+    10.682,
+    9.984,
+    10.601,
+    10.621,
+    10.944,
+    10.536,
+    11.648,
+    9.873,
+    10.964,
+    10.852,
+    10.142,
+    10.962,
+    12.294,
+    9.462,
+    10.667,
+    10.721
+  ],
+  "kv_bytes": 833536,
+  "kv_bytes_stored": 833536,
+  "bytes_per_token": 22528.0,
+  "per_token_errors": [
+    {
+      "token": 0,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 1,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 2,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 3,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 4,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 5,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 6,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 7,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 8,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 9,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 10,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 11,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 12,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 13,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 14,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 15,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 16,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 17,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 18,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 19,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 20,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 21,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 22,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 23,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 24,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 25,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 26,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 27,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 28,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 29,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 30,
+      "err_k": 0.0,
+      "err_v": 0.0
+    },
+    {
+      "token": 31,
+      "err_k": 0.0,
+      "err_v": 0.0
+    }
+  ],
+  "divergence": "identical",
+  "break_point": null,
+  "recon_error": 0.0,
+  "kv_saved_bytes": 0
+}
