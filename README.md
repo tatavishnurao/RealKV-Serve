@@ -32,3 +32,4 @@ See `docs/REPRODUCIBILITY.md` for prerequisites, compatibility boundaries, and t
 | 4 | Simulated latent KV (random projections) | `docs/04_kv_latent_compare.md` | `KV_LATENT_COMPARE_OK=1` |
 | 5 | Structure-preserving KV compression (SVD / head prune / pool) | `docs/05_kv_structured_compare.md` | `KV_STRUCTURED_COMPARE_OK=1` |
 | 6 | Cross-model KV-cache validation | `docs/07_cross_model_validation.md` | `CROSS_MODEL_COMPARE_OK=1` |
+| 7 | Reusable low-rank KV subspace decoding | `docs/08_kv_subspace_decode.md` | `KV_SUBSPACE_DECODE_OK=1` |
