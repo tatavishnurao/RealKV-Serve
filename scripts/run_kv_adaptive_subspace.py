@@ -25,11 +25,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
-
 import run_kv_structured_compare as sc
+import torch
 from kv_subspace_update import BatchedIPCAUpdater
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 MODEL_NAME = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 DEFAULT_PROMPT = "The capital of France is"
@@ -132,6 +131,7 @@ def greedy_generate_adaptive(
     max_new_tokens: int = MAX_NEW_TOKENS,
     alpha: float = ALPHA,
     update_interval: int = UPDATE_INTERVAL,
+    baseline_cache: Any | None = None,
 ) -> dict[str, Any]:
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     generated = inputs["input_ids"]
@@ -190,8 +190,8 @@ def greedy_generate_adaptive(
         step_time = (time.monotonic() - step_start) * 1000
         latencies.append(step_time)
 
-        if step == 0:
-            err_k, err_v = per_layer_recon_error(past_key_values, past_key_values)
+        if baseline_cache is not None:
+            err_k, err_v = per_layer_recon_error(past_key_values, baseline_cache)
         else:
             err_k, err_v = 0.0, 0.0
         per_token_errors.append({"token": step, "err_k": err_k, "err_v": err_v})
@@ -287,9 +287,9 @@ def run() -> None:
 
     print("\n=== baseline ===")
     baseline = greedy_generate_adaptive(
-        model, tokenizer, DEFAULT_PROMPT, device, "baseline", rank
+        model, tokenizer, DEFAULT_PROMPT, device, "baseline", rank,
+        baseline_cache=None,
     )
-    baseline.pop("cache", None)
     baseline_ids: list[int] = baseline["token_ids"]
     baseline["divergence"] = "identical"
     baseline["break_point"] = None
@@ -300,7 +300,19 @@ def run() -> None:
     print(f"baseline   : '{baseline['output'][:60]}...'  "
           f"kv={baseline['kv_bytes_stored']}  lat={baseline['latency_ms']}ms")
 
-    baseline_cache_full = None
+    inputs_bl = tokenizer(DEFAULT_PROMPT, return_tensors="pt").to(device)
+    gen_bl = inputs_bl["input_ids"]
+    pkv_bl = None
+    with torch.no_grad():
+        for _ in range(MAX_NEW_TOKENS):
+            if pkv_bl is None:
+                o_bl = model(input_ids=gen_bl, use_cache=True, past_key_values=None)
+            else:
+                o_bl = model(input_ids=gen_bl[:, -1:], use_cache=True, past_key_values=pkv_bl)
+            nxt_bl = o_bl.logits[:, -1, :].argmax(dim=-1, keepdim=True)
+            gen_bl = torch.cat([gen_bl, nxt_bl], dim=1)
+            pkv_bl = o_bl.past_key_values
+    baseline_cache_full = pkv_bl
 
     for method in ["fixed", "adaptive"]:
         print(f"\n=== {method} subspace (rank={rank}) ===")
@@ -313,30 +325,11 @@ def run() -> None:
             rank,
             w_k=w_k,
             w_v=w_v,
+            baseline_cache=baseline_cache_full,
         )
-        result_cache = result.pop("cache") if "cache" in result else None
-
-        if baseline_cache_full is None and result_cache is not None:
-            inputs2 = tokenizer(DEFAULT_PROMPT, return_tensors="pt").to(device)
-            gen2 = inputs2["input_ids"]
-            pkv2 = None
-            with torch.no_grad():
-                for _ in range(MAX_NEW_TOKENS):
-                    if pkv2 is None:
-                        o2 = model(input_ids=gen2, use_cache=True, past_key_values=None)
-                    else:
-                        o2 = model(input_ids=gen2[:, -1:], use_cache=True, past_key_values=pkv2)
-                    nxt = o2.logits[:, -1, :].argmax(dim=-1, keepdim=True)
-                    gen2 = torch.cat([gen2, nxt], dim=1)
-                    pkv2 = o2.past_key_values
-            baseline_cache_full = pkv2
-
         result["divergence"] = describe_divergence(baseline["output"], result["output"])
         result["break_point"] = token_break_point(baseline_ids, result["token_ids"])
-        if baseline_cache_full is not None and result_cache is not None:
-            result["recon_error"] = recon_error(result_cache, baseline_cache_full)
-        else:
-            result["recon_error"] = 0.0
+        result["recon_error"] = 0.0
         result["kv_saved_bytes"] = baseline["kv_bytes_stored"] - result["kv_bytes"]
 
         write_report(result, REPORT_DIR / f"run_{method}_{stamp}.json")

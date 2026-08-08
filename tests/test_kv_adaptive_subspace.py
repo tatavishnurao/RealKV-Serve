@@ -5,13 +5,14 @@ from __future__ import annotations
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-import kv_subspace_update as update  # noqa: E402
-import run_kv_adaptive_subspace as adaptive  # noqa: E402
+import kv_subspace_update as update
+import run_kv_adaptive_subspace as adaptive
 
 HEAD_DIM = 64
 RANK = 16
@@ -187,15 +188,23 @@ def test_adaptive_report_schema() -> None:
 
 
 def test_adaptive_break_point() -> None:
-    """Both subspace methods record a break point vs baseline."""
+    """Adaptive subspace preserves more tokens than fixed subspace vs baseline."""
     reports = _decode_report_files()
     if not reports:
         pytest.skip("No adaptive decode reports exist")
+    by_method: dict[str, dict[str, Any]] = {}
     for path in reports:
         data = json.loads(path.read_text(encoding="utf-8"))
         if data["method"] != "baseline":
             assert "break_point" in data, f"Missing break_point in {path.name}"
             assert data["break_point"] is None or data["break_point"] >= 0
+        by_method[data["method"]] = data
+    fixed_bp = by_method.get("fixed", {}).get("break_point")
+    adaptive_bp = by_method.get("adaptive", {}).get("break_point")
+    if fixed_bp is not None and adaptive_bp is not None:
+        assert adaptive_bp > fixed_bp, (
+            f"adaptive break_point ({adaptive_bp}) should beat fixed ({fixed_bp})"
+        )
 
 
 def test_adaptive_drift_recorded() -> None:
